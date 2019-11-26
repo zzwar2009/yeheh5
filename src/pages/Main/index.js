@@ -11,10 +11,7 @@ import msgSendingSvg from '@/res/msg.svg';
 import sendFailSvg from '@/res/sendfail.svg';
 import closeSvg from '@/res/close.svg';
 
-
-import s_banner1 from '@/res/s_banner1.png';
-
-import s_banner2 from '@/res/s_banner2.png';
+import SimpleModal from  '@/components/SimpleModal';
 
 
 const  data = [{"send_loading":true,"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"可将团队的其他小程序添加展示在小程序的资料页"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"可将团队的其他小程序添加展示在小程序的资料页"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsfds"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdfsdf"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"woshini",send_result:false},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"inihsow"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"qqqq"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"张铮"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"铮张"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"非多福多寿"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"寿多福多非"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"房贷首付"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"付首贷房"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fds"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdf"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"test"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"tset"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"yrdy"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ydry"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"ff"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ff"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsf"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"fsdf"}]
@@ -26,6 +23,7 @@ export default class Main extends Component {
     constructor(props) {
         super(props)
         this.state = ({
+            modalShow:false,
             loading:true,
             data:data,
             scrollTop: 0,
@@ -52,13 +50,29 @@ export default class Main extends Component {
             value
         })
     }
+
+    toggleModal = () => {
+        const { modalShow } = this.state;
+        this.setState({
+            modalShow:!modalShow
+        })
+    }
+
+
+    closeModal = () => {
+        this.setState({
+            modalShow:false
+        })
+    }
+
+
     renderMsgList(){
         const {data,userInfo,value} = this.state;
 
         return data.map((item,i) =>{
             const {type,username,message,send_loading,send_result} = item;
             if(type == 1){
-                return <div className='l'>
+                return <div className='l' key={i}>
                     <div className='item'>
                         {/* <img className='item-l' src={temp_avatar}></img> */}
                         <div className='item-l'>
@@ -80,7 +94,7 @@ export default class Main extends Component {
                     </div>
                 </div>
             }else{
-                return <div className='r'>
+                return <div className='r' key={i}>
                 <div className='item'>
                     <div className='item-r'>
                         {send_loading && <img src={msgSendingSvg} className='msg_sending'/>}
@@ -96,13 +110,13 @@ export default class Main extends Component {
         
     }
     render() {
-        const {loading,value} = this.state;
+        const {loading,value,modalShow} = this.state;
         return <div className='home-wrap homelayout'>
             {
                 loading? <img src={mainLoading} className='mainloading'/>:(
                 <div className='main-content'>
                     
-                    <div className='app-icon-wrap'>
+                    <div className='app-icon-wrap' onClick={this.toggleModal}>
                         <img src={app_icon} className='app-icon'/>
                         <span className='noti-dot'></span>
                     </div>
@@ -124,6 +138,8 @@ export default class Main extends Component {
                             </form>
                         </div>
                     </div>
+                    
+                    
                     {/* <div className="detail-window">
                         <img src={closeSvg} className='close-btn'/>
                         <div className="detail-wrap">
@@ -153,36 +169,7 @@ export default class Main extends Component {
                             </article>
                         </div>
                     </div> */}
-                    <div className="page-mask">
-                        <div className="app-modal">
-                            <div className="tab-wrap">
-                                <ul className='tab-header'>
-                                    <li class=' tab-header-item'>勾搭指南</li>
-                                    <li className='tab-header-item active'>版本功能</li>
-                                </ul>
-                                <div className="tab-content-wrap">
-                                    <div className="tab-content">
-                                        <img src={s_banner1} className='s_banner'/>
-                                        <p className='somequestion'>“今天有什么好文推荐？”</p>
-                                        <p className='somequestion'>“帮我找套视频社交产品的UI模板”</p>
-                                        <p className='somequestion'>“《交互设计精髓》电子书有吗”</p>
-                                        <p className='somequestion'>“想看帅哥美女图~”</p>
-                                        <p className='somequestion'>“上班摸鱼，有小丑的电影资源吗”</p>
-                                        <p className='somequestion'>……</p>
-                                    </div>
-                                    <div className="tab-content active">
-                                        <img src={s_banner2} className='s_banner2'/>
-                                        <p className='version-text'>加入产品开发社区，共同调教也贺</p>
-                                        <p className='version-text'><span className='imp'>成为</span>AI 语聊训练师</p>
-                                        <p className='version-text'><span className='imp'>解锁</span>发语音、发图片功能</p>
-                                        <p className='version-text'><span className='imp'>解锁</span>分类收藏功能</p>
-                                        <p className='version-text'><span className='imp'>获得</span>永久免费体验权 ……</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>  
-                    
+                    <SimpleModal show={modalShow} closeFun={this.closeModal}/>
                 </div>)
             }
         </div>
