@@ -22,7 +22,8 @@ import {getToken} from '@/services/api';
 const  data = [{"send_loading":true,"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"可将团队的其他小程序添加展示在小程序的资料页"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"可将团队的其他小程序添加展示在小程序的资料页"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsfds"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdfsdf"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"woshini",send_result:false},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"inihsow"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"qqqq"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"张铮"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"铮张"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"非多福多寿"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"寿多福多非"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"房贷首付"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"付首贷房"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fds"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdf"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"test"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"tset"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"yrdy"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ydry"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"ff"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ff"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsf"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"fsdf"}]
 const CHATKEY = 'CHATKEY';
 
-
+const appid = 'wxc67539da0be022b4';
+const redirect_uri	= encodeURI('http://senioryehe.com/');
 
 let messageData = localStorage.getItem(CHATKEY) || [];
 export default class Main extends Component {
@@ -73,8 +74,8 @@ export default class Main extends Component {
                         }else if(status == "FAIL"){
                             if(errorCode == '4002006'){
                                 // openid不存在
-                                const appid = 'wxc67539da0be022b4';
-                                const redirect_uri	= encodeURI('http://senioryehe.com/');
+                                // const appid = 'wxc67539da0be022b4';
+                                // const redirect_uri	= encodeURI('http://senioryehe.com/');
                                 let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_userinfo&state=register#wechat_redirect`;
 
                                 window.location.href = url;
@@ -86,8 +87,8 @@ export default class Main extends Component {
                         }
                     })
                 }else{
-                    const appid = 'wxc67539da0be022b4';
-                    const redirect_uri	= encodeURI('http://senioryehe.com/');
+                    // const appid = 'wxc67539da0be022b4';
+                    // const redirect_uri	= encodeURI('http://senioryehe.com/');
                     let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_base&state=check#wechat_redirect`;
 
                     window.location.href = url;
