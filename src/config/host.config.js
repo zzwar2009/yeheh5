@@ -16,6 +16,8 @@ const UrlConfig = {
     api_host: `${host_ip}api/youhuo/v1/`,
     api_host_v1: `${host_ip}/v1`,
     upload_files_url: `${img_path}/upload`,
+    new_api_host: `http://senioryehe.com/api/client/v1/`,
+    
     // api_host_MSHandler: `${host_ip}/CustomerHandler`,
 };
 

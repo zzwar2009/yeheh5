@@ -421,4 +421,17 @@ export async function getStations(params) {
 
 
 
+// 授权API地址是：/api/client/v1/user/login?code=xxx&state=xxx
+
+//获取微信code- 进一步》换取token
+export async function getToken(code,state) {
+    return request(UrlConfig.new_api_host, 'user/login', {
+        method: 'GET',
+        data: {
+            code,
+            state
+        },
+    });
+}
+
 

@@ -77,7 +77,7 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
     "deploy-staging": "node scripts/build.js && scp -r build/* root@10.0.0.18:/www/wwwroot/staging-oil-m.tjyunshi.com",
-    "deploy": "node scripts/build.js && scp -r build/* root@10.0.0.18:/www/wwwroot/oil-m.tjyunshi.com"
+    "deploy": "node scripts/build.js && scp -r build/* ubuntu@118.89.16.143:/data0/frontend/yeheh5"
   },
   "jest": {
     "collectCoverageFrom": [

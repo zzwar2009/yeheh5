@@ -69,7 +69,31 @@ const getEnv = () =>{
     window.env = env;
     return env;
 }
+//是否在微信环境
+function isInWeiXin(){
+    var ua = navigator.userAgent.toLowerCase();
+    var isWeixin = ua.indexOf('micromessenger') != -1;
+    if (isWeixin) {
+        return true;
+    }else{
+        return false;
+    }
+}
 
+
+//获取微信回掉参数
+function getUrlParam (name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)')
+    let url = window.location.href.split('#')[0]
+    let search = url.split('?')[1]
+    if (search) {
+      var r = search.substr(0).match(reg)
+      if (r !== null) return unescape(r[2])
+      return null
+    } else {
+      return null
+    }
+}
 const Tools = {
     parseParams,
     checkField,
@@ -81,7 +105,9 @@ const Tools = {
     H5,
     SQZX_CHINESE_NAME,
     DS_CHINESE_NAME,
-    H5_CHINESE_NAME
+    H5_CHINESE_NAME,
+    isInWeiXin,
+    getUrlParam
 }
 
 module.exports = Tools
