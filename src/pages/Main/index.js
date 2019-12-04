@@ -18,8 +18,31 @@ import {isInWeiXin,getUrlParam} from '@/utils/Tools';
 
 import {getToken} from '@/services/api';
 
-
-const  data = [{"send_loading":true,"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"可将团队的其他小程序添加展示在小程序的资料页"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"可将团队的其他小程序添加展示在小程序的资料页"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsfds"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdfsdf"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"woshini",send_result:false},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"inihsow"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"qqqq"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"张铮"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"铮张"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"非多福多寿"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"寿多福多非"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"房贷首付"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"付首贷房"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fds"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdf"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"test"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"tset"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"yrdy"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ydry"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"ff"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ff"},{"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsf"},{"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"fsdf"}]
+// type 0是发  1是收
+const  data = [
+    {"send_loading":true,"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"可将团队的其他小程序添加展示在小程序的资料页"},
+    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"可将团队的其他小程序添加展示在小程序的资料页"},
+    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsfds"},
+    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdfsdf"},
+    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"woshini",send_result:false},
+    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"inihsow"},
+    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"qqqq"},
+    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"张铮"},
+    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"铮张"},
+    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"非多福多寿"},
+    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"寿多福多非"},
+    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"房贷首付"},
+    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"付首贷房"},
+    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fds"},
+    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdf"},
+    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"test"},
+    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"tset"},
+    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"yrdy"},
+    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ydry"},
+    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"ff"},
+    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ff"},
+    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsf"},
+    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"fsdf"}]
 const CHATKEY = 'CHATKEY';
 
 const appid = 'wxc67539da0be022b4';
@@ -32,7 +55,7 @@ export default class Main extends Component {
         this.state = ({
             modalShow:false,
             loading:true,
-            data:data,
+            data:[],
             scrollTop: 0,
             userInfo:{
                 avatarUrl:'',
@@ -40,18 +63,95 @@ export default class Main extends Component {
             value:''
         })
     }
-    
-    componentDidMount() {
-        let that = this;
-        setTimeout(function(){
-            that.setState({
-                loading:false
-            })
-        },1000)
+    connect = (userid) =>{
+        const that = this;
+        this.userid = userid;
+        var url = "http://senioryehe.com/yehe/ws";
+		var sock = new window.SockJS(url);
+        var ws = window.Stomp.over(sock);
+        window.ws = ws;
+		// var userId = "aaaa-ddd-4dsdd-43a";
+		var payload = {
+			"userId": userid,
+			"content": ""
+		};
+		ws.connect({}, function() {
+            // alert("connect");
+            that.connectStatus = 1;//链接成功;
+			ws.send("/app/consult", {}, JSON.stringify(payload));
+			ws.subscribe("/topic/"+userid, function(resp) {
+                console.log(resp.body);
+                const messageobj = resp.body ? JSON.parse(resp.body) : {}
+                const {sessionId,message,messageType,greet,type} = messageobj;
+                let { data }= that.state;
 
-        if(isInWeiXin()){// 在微信打开情况
-            let token = localStorage.getItem('token');
-            if(!token){
+                // {
+                // "type":"4",
+                // "messageType":0,
+                // "greet":{
+                //     "id":3,
+                //     "img":"[]",
+                //     "createTime":"2019-11-29 00:26:50",
+                //     "updateTime":"2019-11-29 00:26:50",
+                //     "greetExtendsList":[
+                //         {"content":"我就是也贺，能帮你找资料找素材，需要什么可以找我要。🦄\n别问都能找什么，我不敢说。😝"},
+                //         {"content":"有好玩的行业新闻我会推给你，记得经常来摸鱼鸭"}]
+                //     }
+                // }
+
+                if(type == 4 && greet){
+                    console.log(greet);
+                    const {greetExtendsList} = greet;
+                    greetExtendsList.forEach(function(item){
+                        const {content} = item;
+                        data.push({
+                            "userid":sessionId,
+                            "username":"小助手",
+                            "type":"1",
+                            "avatar":"../../assets/avatar.png",
+                            // sessionId,
+                            message:content,
+                            messageType:0
+        
+                        })
+                    })
+                }else{
+                    data.push({
+                        "userid":sessionId,
+                        "username":"小助手",
+                        "type":"1",
+                        "avatar":"../../assets/avatar.png",
+                        // sessionId,
+                        message,
+                        messageType,
+                        ...messageobj
+    
+                    })
+                }
+
+                // {"sessionId":"71e68aa6ec864673a66f2b38dcfd6e30","message":"您这个问题太难了，也贺还不能解答，我会好好努力学习的！","messageType":0}
+               
+                console.log(data);
+                that.setState({
+                    data
+                })
+			});
+		}, function(err) {
+			alert(err);
+        });
+    }
+    componentDidMount() {
+        // this.connect();
+
+        let that = this;
+
+        
+        let token = localStorage.getItem('token');
+        let userid = localStorage.getItem('userid');
+        // alert("token:   "+token)
+        if(!token){
+            // 在微信打开情况 去获取token
+            if(isInWeiXin()){
                 const code = getUrlParam('code');
                 const state = getUrlParam('state');
                 if(code){
@@ -71,6 +171,14 @@ export default class Main extends Component {
                             localStorage.setItem('token',token)
                             localStorage.setItem('refreshToken',refreshToken)
                             localStorage.setItem('userId',userId)
+
+                            // 获取token成功后 关闭loading
+                            setTimeout(function(){
+                                that.setState({
+                                    loading:false
+                                })
+                            },1000)
+                            that.connect(userId);
                         }else if(status == "FAIL"){
                             if(errorCode == '4002006'){
                                 // openid不存在
@@ -94,15 +202,66 @@ export default class Main extends Component {
                     window.location.href = url;
                 }
             }
+        }else{
+            setTimeout(function(){
+                that.setState({
+                    loading:false
+                })
+            },1000)
+            that.connect(userid);
         }
         
+        
     }
-    send(e){
+    onChange(e){
         const {value} = e.target;
         //发送文字
         this.setState({
             value
         })
+    }
+    handleEnterKey = (e) =>{
+        if(e.nativeEvent.keyCode === 13){ //e.nativeEvent获取原生的事件对像
+            this.send()
+       }
+    }
+
+    gotoBottom = () =>{
+        document.getElementsByClassName('chat-main-panel')[0].scrollTop = 10000
+    }
+    clearInput =()=>{ //清空input
+        this.setState({
+            value:""
+        })
+    }
+    send = () =>{
+        //发送
+        const {value,data} = this.state;
+        data.push(
+            {
+            "send_loading":true,
+            "userid":"",
+            "type":"0",
+            "username":"../../assets/avatar.png",
+            "avatar":"",
+            "message":value
+        })
+        this.setState({
+            data
+        },function(){
+            this.gotoBottom();
+        });
+
+        //真的去发送消息给后台
+        if(this.connectStatus ==1){
+            var payload = {
+                "userId": this.userid,
+                "content": value
+            };
+            window.ws.send("/app/consult", {}, JSON.stringify(payload));
+        }
+        this.clearInput();
+        
     }
 
     toggleModal = () => {
@@ -119,24 +278,71 @@ export default class Main extends Component {
         })
     }
 
+    renderRecivedMsg = (item) =>{//收到的消息渲染
+        const {type,message,send_loading,send_result,messageType,recommendList} = item;
+
+        // {"sessionId":"18853c4fd76649d997b2a48b383e07f9",
+        // "message":"您要找的是哪个呢？",
+        // "messageType":2,
+        // "recommendList":[
+        //     {"knowledgeId":"1000832152","answerSource":"RECOMMEND","title":"UI群英汇，用户体验交互视觉设计方法论电子书"}
+        // ]
+        // }
+        let msgDom = '';
+        switch(messageType){
+            case 0:// 纯文本或者闲聊(直接展示)，
+                msgDom = (<span className='user-text'>{message}</span>)
+                break;
+            case 1://知识库（对应knowledge）,富文本类型html
+                msgDom = (<span className='user-text' dangerouslySetInnerHTML={{__html: message}}></span>)
+                break;
+            case 2://推荐选项（对应recommendList）
+                msgDom = (
+                    <ul className="item-l-choices">
+                    <p className='choice-item-title'>{message}</p>
+                        {recommendList.map(function(item){
+                            const {title,knowledgeId,answerSource} = item;
+                            return <li knowledgeId={knowledgeId} answerSource={answerSource}>{title}</li>
+                        })}
+                </ul>
+               );
+                break;
+            case 3://资源卡(对应resourceList)，
+                msgDom = (<div className='item-l-card'>
+                    <img src='https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1820747320,1554574827&fm=26&gp=0.jpg' className='card-img'/>
+                    <div className='card-r'>
+                        <p>什么什么样的素材</p>
+                        <span>一行小描述一行小描述一行小描述一行小哈</span>
+                    </div>
+                </div>)
+                break;
+            case 4://打招呼（对应greet）
+                msgDom = (<span className='user-text'>{message}</span>)
+                break;
+            default:
+                msgDom = (<span className='user-text'>fdsfds</span>)
+
+        }
+        return msgDom;
+    }
 
     renderMsgList(){
         const {data,userInfo,value} = this.state;
 
         return data.map((item,i) =>{
-            const {type,username,message,send_loading,send_result} = item;
+            const {type,username,message,send_loading,send_result,messageType} = item;
             if(type == 1){
                 return <div className='l' key={i}>
                     <div className='item'>
-                        {/* <img className='item-l' src={temp_avatar}></img> */}
                         <div className='item-l'>
-                            <div className='item-l-card'>
+                            {this.renderRecivedMsg(item)}
+                            {/* <div className='item-l-card'>
                                 <img src='https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1820747320,1554574827&fm=26&gp=0.jpg' className='card-img'/>
                                 <div className='card-r'>
                                     <p>什么什么样的素材</p>
                                     <span>一行小描述一行小描述一行小描述一行小哈</span>
                                 </div>
-                            </div>
+                            </div> */}
                             {/* <ul className="item-l-choices disable">
                                 <li>你选A</li>
                                 <li>你选B</li>
@@ -187,9 +393,7 @@ export default class Main extends Component {
                             </div>
                         </div>
                         <div className="input-wrap">
-                            <form type='submit' value="OK">
-                                <input value={value} placeholder="说点什么吧..." onChange={this.send.bind(this)}></input>
-                            </form>
+                            <input value={value} placeholder="说点什么吧..." onKeyPress={this.handleEnterKey} onChange={this.onChange.bind(this)}></input>
                         </div>
                     </div>
                     

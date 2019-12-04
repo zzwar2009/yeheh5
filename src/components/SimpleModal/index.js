@@ -40,12 +40,12 @@ export default class SimpleModal extends Component {
 
         const headeritems = ['勾搭指南','版本功能'].map((current,index) =>{
             let  clstabheaderitem = classNames('tab-header-item',{"active":index==activeIndex})
-        return <li className={clstabheaderitem} onClick={(e) => { e.stopPropagation();this.openTab(index)} }>{current}</li>
+        return <li key={index} className={clstabheaderitem} onClick={(e) => { e.stopPropagation();this.openTab(index)} }>{current}</li>
         })
         const contentitems = [0,1].map((index) =>{
             let  clscontentitem = classNames('tab-content',{"active":index==activeIndex})
             if(index ==0){
-                return <div className={clscontentitem}>
+                return <div className={clscontentitem} key={"fffff"}>
                         <img src={s_banner1} className='s_banner'/>
                         <p className='somequestion'>“今天有什么好文推荐？”</p>
                         <p className='somequestion'>“帮我找套视频社交产品的UI模板”</p>
@@ -56,7 +56,7 @@ export default class SimpleModal extends Component {
                 </div>
             }
             if(index == 1){
-                return <div className={clscontentitem}>
+                return <div className={clscontentitem} key={"fdsfds"}>
                     <img src={s_banner2} className='s_banner2'/>
                     <p className='version-text'>加入产品开发社区，共同调教也贺</p>
                     <p className='version-text'><span className='imp'>成为</span>AI 语聊训练师</p>

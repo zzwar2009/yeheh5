@@ -435,3 +435,30 @@ export async function getToken(code,state) {
 }
 
 
+export async function getCardDetail(id) {
+    return request(UrlConfig.new_api_host, `resource/getDetails/${id}`, {
+        method: 'POST',
+        // data: {
+        //     code,
+        //     state
+        // },
+    });
+}
+
+
+
+export async function addClickNum(id) {
+    return request(UrlConfig.new_api_host, `resource/addClickNum/${id}`, {
+        method: 'GET',
+        // data: {
+        //     code,
+        //     state
+        // },
+    });
+}
+
+
+// /api/client/v1/resource/getDetails/{id}
+
+// /api/client/v1/resource/addClickNum/{id}
+
