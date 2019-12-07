@@ -17,38 +17,48 @@ import {isInWeiXin,getUrlParam} from '@/utils/Tools';
 
 
 import {getToken} from '@/services/api';
-
+const wx = window.wx;
 // type 0是发  1是收
 const  data = [
-    {"send_loading":true,"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"可将团队的其他小程序添加展示在小程序的资料页"},
-    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"可将团队的其他小程序添加展示在小程序的资料页"},
-    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsfds"},
-    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdfsdf"},
-    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"woshini",send_result:false},
-    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"inihsow"},
-    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"qqqq"},
-    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"张铮"},
-    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"铮张"},
-    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"非多福多寿"},
-    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"寿多福多非"},
-    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"房贷首付"},
-    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"付首贷房"},
-    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fds"},
-    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdf"},
-    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"test"},
-    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"tset"},
-    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"yrdy"},
-    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ydry"},
-    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"ff"},
-    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ff"},
-    {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsf"},
-    {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"fsdf"}]
+    // {"send_loading":true,"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"可将团队的其他小程序添加展示在小程序的资料页"},
+    // {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"可将团队的其他小程序添加展示在小程序的资料页"},
+    // {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsfds"},
+    // {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdfsdf"},
+    // {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"woshini",send_result:false},
+    // {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"inihsow"},
+    // {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"qqqq"},
+    // {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"张铮"},
+    // {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"铮张"},
+    // {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"非多福多寿"},
+    // {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"寿多福多非"},
+    // {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"房贷首付"},
+    // {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"付首贷房"},
+    // {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fds"},
+    // {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"sdf"},
+    // {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"test"},
+    // {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"tset"},
+    // {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"yrdy"},
+    // {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ydry"},
+    // {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"ff"},
+    // {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"ff"},
+    // {"userid":"","type":"0","username":"../../assets/avatar.png","avatar":"","message":"fdsf"},
+    // {"userid":"","username":"小助手","type":"1","avatar":"../../assets/avatar.png","message":"fsdf"}
+
+]
 const CHATKEY = 'CHATKEY';
 
 const appid = 'wxc67539da0be022b4';
 const redirect_uri	= encodeURI('http://senioryehe.com/');
 
 let messageData = localStorage.getItem(CHATKEY) || [];
+const TEXT = "TEXT";
+const IMG = "IMG";
+const RECOMMEND = "RECOMMEND";
+const CARD = "CARD";
+
+const GREET = "GREET";
+const CHAT = "CHAT";
+const ACK = "ACK";
 export default class Main extends Component {
     constructor(props) {
         super(props)
@@ -62,6 +72,15 @@ export default class Main extends Component {
             },
             value:''
         })
+
+        wx && wx.config({
+            debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: appid, // 必填，公众号的唯一标识
+            timestamp: '', // 必填，生成签名的时间戳
+            nonceStr: '', // 必填，生成签名的随机串
+            signature: '',// 必填，签名
+            jsApiList: ['previewImage'] // 必填，需要使用的JS接口列表
+        });
     }
     connect = (userid) =>{
         const that = this;
@@ -73,65 +92,58 @@ export default class Main extends Component {
 		// var userId = "aaaa-ddd-4dsdd-43a";
 		var payload = {
 			"userId": userid,
-			"content": ""
+            "content": "1",
+            "action":"GREET"
 		};
 		ws.connect({}, function() {
             // alert("connect");
             that.connectStatus = 1;//链接成功;
 			ws.send("/app/consult", {}, JSON.stringify(payload));
 			ws.subscribe("/topic/"+userid, function(resp) {
+                console.log("============")
                 console.log(resp.body);
+                console.log("============")
                 const messageobj = resp.body ? JSON.parse(resp.body) : {}
-                const {sessionId,message,messageType,greet,type} = messageobj;
+                const {sessionId,message,messageType,action} = messageobj;
                 let { data }= that.state;
 
-                // {
-                // "type":"4",
-                // "messageType":0,
-                // "greet":{
-                //     "id":3,
-                //     "img":"[]",
-                //     "createTime":"2019-11-29 00:26:50",
-                //     "updateTime":"2019-11-29 00:26:50",
-                //     "greetExtendsList":[
-                //         {"content":"我就是也贺，能帮你找资料找素材，需要什么可以找我要。🦄\n别问都能找什么，我不敢说。😝"},
-                //         {"content":"有好玩的行业新闻我会推给你，记得经常来摸鱼鸭"}]
-                //     }
-                // }
 
-                if(type == 4 && greet){
-                    console.log(greet);
-                    const {greetExtendsList} = greet;
-                    greetExtendsList.forEach(function(item){
-                        const {content} = item;
-                        data.push({
-                            "userid":sessionId,
-                            "username":"小助手",
-                            "type":"1",
-                            "avatar":"../../assets/avatar.png",
-                            // sessionId,
-                            message:content,
-                            messageType:0
+                if(action == GREET){
+                    // console.log(greet);
+                    // const {greetExtendsList} = greet;
+                    // greetExtendsList.forEach(function(item){
+                    //     const {content} = item;
+                    //     data.push({
+                    //         "userid":sessionId,
+                    //         "username":"小助手",
+                    //         "type":"1",
+                    //         "avatar":"../../assets/avatar.png",
+                    //         // sessionId,
+                    //         message:content,
+                    //         messageType:0
         
-                        })
-                    })
+                    //     })
+                    // })
                 }else{
-                    data.push({
-                        "userid":sessionId,
-                        "username":"小助手",
-                        "type":"1",
-                        "avatar":"../../assets/avatar.png",
-                        // sessionId,
-                        message,
-                        messageType,
-                        ...messageobj
-    
-                    })
+                    if(action != ACK){
+                        data.push({
+                            // "userid":sessionId,
+                            // "username":"小助手",
+                            "type":"1",
+                            // "avatar":"../../assets/avatar.png",
+                            sessionId,
+                            message,
+                            messageType,
+                            ...messageobj
+                        })
+                    }else if(action == ACK){
+
+
+                    }
+                    
                 }
 
-                // {"sessionId":"71e68aa6ec864673a66f2b38dcfd6e30","message":"您这个问题太难了，也贺还不能解答，我会好好努力学习的！","messageType":0}
                
-                console.log(data);
                 that.setState({
                     data
                 })
@@ -237,13 +249,16 @@ export default class Main extends Component {
     send = () =>{
         //发送
         const {value,data} = this.state;
+        if(value == ''){
+            return;
+        }
         data.push(
             {
             "send_loading":true,
             "userid":"",
             "type":"0",
-            "username":"../../assets/avatar.png",
-            "avatar":"",
+            // "username":"../../assets/avatar.png",
+            // "avatar":"",
             "message":value
         })
         this.setState({
@@ -256,12 +271,20 @@ export default class Main extends Component {
         if(this.connectStatus ==1){
             var payload = {
                 "userId": this.userid,
-                "content": value
+                "content": value,
+                "action":CHAT
             };
             window.ws.send("/app/consult", {}, JSON.stringify(payload));
         }
         this.clearInput();
         
+    }
+    previewByWx = (url) =>{
+        console.log(url)
+        wx && wx.previewImage({
+            current: url, // 当前显示图片的http链接
+            urls: [url] // 需要预览的图片http链接列表
+          });
     }
 
     toggleModal = () => {
@@ -278,8 +301,42 @@ export default class Main extends Component {
         })
     }
 
+    replyReommend = (recomm,message) =>{
+        //选择
+        const {title,knowledgeId,answerSource} = recomm;
+        const {value,data} = this.state;
+        data.push(
+            {
+            "send_loading":true,
+            "userid":"",
+            "type":"0",
+            // "username":"../../assets/avatar.png",
+            // "avatar":"",
+            "message":title
+        })
+        this.setState({
+            data
+        },function(){
+            this.gotoBottom();
+        });
+
+        //真的去发送消息给后台
+        if(this.connectStatus ==1){
+            var payload = {
+                "userId": this.userid,
+                // "content": value,
+                "action":CHAT,
+                knowledgeId,
+                sessionId:message.sessionId
+            };
+            debugger
+            window.ws.send("/app/consult", {}, JSON.stringify(payload));
+        }
+    }
+
     renderRecivedMsg = (item) =>{//收到的消息渲染
-        const {type,message,send_loading,send_result,messageType,recommendList} = item;
+        let that = this;
+        const {type,message,send_loading,send_result,messageType,recommendList,resourceDto} = item;
 
         // {"sessionId":"18853c4fd76649d997b2a48b383e07f9",
         // "message":"您要找的是哪个呢？",
@@ -290,29 +347,33 @@ export default class Main extends Component {
         // }
         let msgDom = '';
         switch(messageType){
-            case 0:// 纯文本或者闲聊(直接展示)，
-                msgDom = (<span className='user-text'>{message}</span>)
-                break;
-            case 1://知识库（对应knowledge）,富文本类型html
+            case TEXT:// 纯文本或者闲聊(直接展示)，
                 msgDom = (<span className='user-text' dangerouslySetInnerHTML={{__html: message}}></span>)
                 break;
-            case 2://推荐选项（对应recommendList）
+            case IMG:
+                msgDom = (<img className='user-img' src={message} onClick = {() => {that.previewByWx(message)}}></img>)
+                break;
+            // case 1://知识库（对应knowledge）,富文本类型html
+            //     msgDom = (<span className='user-text' dangerouslySetInnerHTML={{__html: message}}></span>)
+            //     break;
+            case RECOMMEND://推荐选项（对应recommendList） 知识库（对应knowledge）
                 msgDom = (
                     <ul className="item-l-choices">
                     <p className='choice-item-title'>{message}</p>
-                        {recommendList.map(function(item){
-                            const {title,knowledgeId,answerSource} = item;
-                            return <li knowledgeId={knowledgeId} answerSource={answerSource}>{title}</li>
+                        {recommendList.map(function(obj,i){
+                            const {title,knowledgeId,answerSource} = obj;
+                            return <li key = {i} onClick={()=>{that.replyReommend(obj,item)}}>{title}</li>
                         })}
                 </ul>
                );
                 break;
-            case 3://资源卡(对应resourceList)，
+            case CARD://资源卡(对应resourceList)，
+                const {name,describes,img} = resourceDto;
                 msgDom = (<div className='item-l-card'>
-                    <img src='https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1820747320,1554574827&fm=26&gp=0.jpg' className='card-img'/>
+                    <img src={img} className='card-img'/>
                     <div className='card-r'>
-                        <p>什么什么样的素材</p>
-                        <span>一行小描述一行小描述一行小描述一行小哈</span>
+                        <p>{name}</p>
+                        <span>{describes}</span>
                     </div>
                 </div>)
                 break;
@@ -330,6 +391,7 @@ export default class Main extends Component {
         const {data,userInfo,value} = this.state;
 
         return data.map((item,i) =>{
+            console.log(item)
             const {type,username,message,send_loading,send_result,messageType} = item;
             if(type == 1){
                 return <div className='l' key={i}>
@@ -393,7 +455,9 @@ export default class Main extends Component {
                             </div>
                         </div>
                         <div className="input-wrap">
-                            <input value={value} placeholder="说点什么吧..." onKeyPress={this.handleEnterKey} onChange={this.onChange.bind(this)}></input>
+                            <form action="javascript:return true">
+                                <input value={value} placeholder="说点什么吧..." onKeyPress={this.handleEnterKey} onChange={this.onChange.bind(this)}></input>
+                            </form>
                         </div>
                     </div>
                     

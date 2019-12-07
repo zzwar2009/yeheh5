@@ -347,6 +347,7 @@
         margin:5px;
         font-size: 14px;
         text-align: left;
+        word-break: break-word;
     }
     .r .item .user-text{
         background:#ED6961FF;
@@ -388,6 +389,13 @@
             font-weight:400;
             color:rgba(210,210,210,1);
             line-height:16px;
+            display: -webkit-box;
+            overflow: hidden;
+            /* autoprefixer: off*/
+            -webkit-box-orient: vertical;
+            /* autoprefixer: on*/
+            text-overflow: ellipsis;
+            -webkit-line-clamp: 2;
         }
     }
     .card-img{
