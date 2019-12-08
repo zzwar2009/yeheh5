@@ -16,7 +16,7 @@ import SimpleModal from  '@/components/SimpleModal';
 import {isInWeiXin,getUrlParam} from '@/utils/Tools';
 
 
-import {getToken} from '@/services/api';
+import {getToken,addClickNum,getCardDetail} from '@/services/api';
 const wx = window.wx;
 // type 0是发  1是收
 const  data = [
@@ -59,9 +59,11 @@ const CARD = "CARD";
 const GREET = "GREET";
 const CHAT = "CHAT";
 const ACK = "ACK";
+const $ = window.$;
 export default class Main extends Component {
     constructor(props) {
         super(props)
+        
         this.state = ({
             modalShow:false,
             loading:true,
@@ -70,7 +72,11 @@ export default class Main extends Component {
             userInfo:{
                 avatarUrl:'',
             },
-            value:''
+            value:'',
+            showDetail:false,
+            detailEntity:{
+
+            }
         })
 
         wx && wx.config({
@@ -107,7 +113,7 @@ export default class Main extends Component {
                 const {sessionId,message,messageType,action} = messageobj;
                 let { data }= that.state;
 
-
+                that.sessionId = sessionId;
                 if(action == GREET){
                     // console.log(greet);
                     // const {greetExtendsList} = greet;
@@ -249,17 +255,19 @@ export default class Main extends Component {
     send = () =>{
         //发送
         const {value,data} = this.state;
+        let that = this;
         if(value == ''){
             return;
         }
         data.push(
             {
-            "send_loading":true,
-            "userid":"",
+            // "send_loading":true,
+            // "userid": this.userid,
             "type":"0",
             // "username":"../../assets/avatar.png",
             // "avatar":"",
-            "message":value
+            "message":value,
+            "sessionId":that.sessionId
         })
         this.setState({
             data
@@ -272,7 +280,8 @@ export default class Main extends Component {
             var payload = {
                 "userId": this.userid,
                 "content": value,
-                "action":CHAT
+                "action":CHAT,
+                "sessionId":that.sessionId
             };
             window.ws.send("/app/consult", {}, JSON.stringify(payload));
         }
@@ -300,6 +309,28 @@ export default class Main extends Component {
             modalShow:false
         })
     }
+    openCard = (id) =>{
+        let that = this;
+       
+        //打开卡片
+        getCardDetail(id).then(function(res){
+            console.log(res)
+            const { status ,entity} = res;
+            if(status == "OK"){
+                 //打点
+                // addClickNum(id);
+
+                console.log(entity)
+                that.setState({
+                    showDetail:true,
+                    detailEntity:entity
+                })
+
+            }else{
+
+            }
+        })
+    }
 
     replyReommend = (recomm,message) =>{
         //选择
@@ -307,8 +338,8 @@ export default class Main extends Component {
         const {value,data} = this.state;
         data.push(
             {
-            "send_loading":true,
-            "userid":"",
+            // "send_loading":true,
+            "userid": this.userid,
             "type":"0",
             // "username":"../../assets/avatar.png",
             // "avatar":"",
@@ -324,12 +355,11 @@ export default class Main extends Component {
         if(this.connectStatus ==1){
             var payload = {
                 "userId": this.userid,
-                // "content": value,
+                "content": title,
                 "action":CHAT,
                 knowledgeId,
                 sessionId:message.sessionId
             };
-            debugger
             window.ws.send("/app/consult", {}, JSON.stringify(payload));
         }
     }
@@ -368,8 +398,8 @@ export default class Main extends Component {
                );
                 break;
             case CARD://资源卡(对应resourceList)，
-                const {name,describes,img} = resourceDto;
-                msgDom = (<div className='item-l-card'>
+                const {name,describes,img,id} = resourceDto;
+                msgDom = (<div className='item-l-card' onClick={()=>{that.openCard(id)}}>
                     <img src={img} className='card-img'/>
                     <div className='card-r'>
                         <p>{name}</p>
@@ -431,8 +461,86 @@ export default class Main extends Component {
         })
         
     }
+    closeDetail = () =>{
+        //关闭的detail
+        this.setState({
+            showDetail:false
+        })
+    }
+    copy =() =>{
+        //复制
+        let me = $('#target_url')[0];
+        me.focus();
+        me.select();
+        try{
+            if(document.execCommand('copy', false, null)){
+                //success info
+                Toast.success("复制HTML链接成功",2);
+            } else{
+                //fail info
+            }
+
+        } catch(err){
+            //fail info
+        }
+    }
+    showDetailModal = () =>{
+        
+        const {detailEntity} = this.state;
+        const {img,name,tag,type,years,extraInformation,fileFormat,describes,createTime} = detailEntity;
+        const tags = tag.split(' ').map(function(tagitem){
+            return <span className="tag">{tagitem}</span>
+        })
+        let imgDom = "";
+        if(Array.isArray(img)){
+            if( img.length == 1){
+                imgDom = (<img className='single-banner' src={img[0]}/>)
+            } else{
+                const a = Math.floor(img / 2);
+                const b = img % 2;
+                var arr = [];
+                for (var i =0;i<a ;i+2){
+                    const f = i+1;
+                    const s = i+2;
+                    arr.push(
+                        <div className="multi-banner">
+                            <img className='' src={img[f]}/>
+                            {img.length>s ? <img className='' src={img[s]}/> :""}
+                        </div>
+                    )
+                    imgDom ={arr}
+                }
+            }
+        }
+        
+        //详情模块
+        return (
+            <div className="detail-window">
+                <img src={closeSvg} className='close-btn' onClick={this.closeDetail}/>
+                <div className="detail-wrap">
+                    {imgDom}
+                    <h3>{name}</h3>
+                    <p>
+                        {tags}
+                    </p>
+                    <div className="wangpan-address">
+                        <p className="link-info">
+                            {/* 链接:https://pan.baidu.com/s/19pNAsmsFGTdert 密码:2he4 */}
+                            链接:{extraInformation}
+                        </p>
+                        <span className="copy-btn" onClick={()=>{this.copy()}}>复制</span>
+                    </div>
+                    <article> 
+                        {describes}
+                    </article>
+                    <input id ='target_url' style={{opacity:0,height:0}} type="text" value={extraInformation}/>
+                </div>
+            </div>
+        )
+    }
     render() {
-        const {loading,value,modalShow} = this.state;
+        const {loading,value,modalShow,showDetail,detailEntity} = this.state;
+        const detailEntityModal = showDetail ? this.showDetailModal(): "";
         return <div className='home-wrap homelayout'>
             {
                 loading? <img src={mainLoading} className='mainloading'/>:(
@@ -460,37 +568,7 @@ export default class Main extends Component {
                             </form>
                         </div>
                     </div>
-                    
-                    
-                    {/* <div className="detail-window">
-                        <img src={closeSvg} className='close-btn'/>
-                        <div className="detail-wrap">
-                            <div className="multi-banner">
-                                <img className='' src='https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1820747320,1554574827&fm=26&gp=0.jpg'/>
-                                <img className='' src='https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1820747320,1554574827&fm=26&gp=0.jpg'/>
-                            </div>
-                            <div className="multi-banner">
-                                <img className='' src='https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1820747320,1554574827&fm=26&gp=0.jpg'/>
-                            </div>
-                            <img className='single-banner' src='https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1820747320,1554574827&fm=26&gp=0.jpg'/>
-                            <h3>游戏电子虚拟交易类电商</h3>
-                            <p>
-                                <span className="tag">sketch</span>
-                                <span className="tag">sketch</span>
-                                <span className="tag">sketch</span>
-                                <span className="tag">sketch</span>
-                            </p>
-                            <div className="wangpan-address">
-                                <p className="link-info">
-                                    链接:https://pan.baidu.com/s/19pNAsmsFGTdert 密码:2he4
-                                </p>
-                                <span className="copy-btn">复制</span>
-                            </div>
-                            <article> 
-                            We are very happy to present to you Le Trip – Travel planner UI KIT, a modern, trendy and minimal application to support self-sufficient travelers with the simplest, most effective preparation. With the outstanding feature of automatic scheduling, discovering surrouding services at destinations, and a community to connect and share your journey. 
-                            </article>
-                        </div>
-                    </div> */}
+                    {detailEntityModal}
                     <SimpleModal show={modalShow} closeFun={this.closeModal}/>
                 </div>)
             }

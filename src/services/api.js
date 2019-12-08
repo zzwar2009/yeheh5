@@ -437,7 +437,7 @@ export async function getToken(code,state) {
 
 export async function getCardDetail(id) {
     return request(UrlConfig.new_api_host, `resource/getDetails/${id}`, {
-        method: 'POST',
+        method: 'GET',
         // data: {
         //     code,
         //     state
