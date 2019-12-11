@@ -163,6 +163,9 @@ export default class Main extends Component {
         });
     }
     componentDidMount() {
+
+
+        
         // this.connect();
 
         let that = this;
@@ -376,7 +379,14 @@ export default class Main extends Component {
             window.ws.send("/app/consult", {}, JSON.stringify(payload));
         }
     }
-
+    onFocus = () =>{
+        let that = this;
+        // setTimeout(function(){
+            // document.documentElement.scrollTop = 10000;
+            console.log('focus====')
+            document.body.scrollTop = document.documentElement.scrollTop =86;
+        // },50)
+    }
     renderRecivedMsg = (item) =>{//收到的消息渲染
         let that = this;
         const {type,message,send_loading,send_result,messageType,recommendList,resourceDto} = item;
@@ -577,7 +587,7 @@ export default class Main extends Component {
                         </div>
                         <div className="input-wrap">
                             <form action="javascript:return true">
-                                <input value={value}  confirm-type="send" confirm-hold="true" placeholder="说点什么吧..." onKeyPress={this.handleEnterKey} onChange={this.onChange.bind(this)}></input>
+                                <input value={value}  confirm-type="send" confirm-hold="true" placeholder="说点什么吧..." onKeyPress={this.handleEnterKey} onChange={this.onChange.bind(this)} onFocus={this.onFocus}></input>
                                 <span className='send-btn' onClick={this.send}>发送</span>
                             </form>
                         </div>
