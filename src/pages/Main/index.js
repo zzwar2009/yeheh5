@@ -79,14 +79,14 @@ export default class Main extends Component {
             }
         })
 
-        wx && wx.config({
-            debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-            appId: appid, // 必填，公众号的唯一标识
-            timestamp: '', // 必填，生成签名的时间戳
-            nonceStr: '', // 必填，生成签名的随机串
-            signature: '',// 必填，签名
-            jsApiList: ['previewImage'] // 必填，需要使用的JS接口列表
-        });
+        // wx && wx.config({
+        //     debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        //     appId: appid, // 必填，公众号的唯一标识
+        //     timestamp: '', // 必填，生成签名的时间戳
+        //     nonceStr: '', // 必填，生成签名的随机串
+        //     signature: '',// 必填，签名
+        //     jsApiList: ['previewImage'] // 必填，需要使用的JS接口列表
+        // });
     }
     connect = (userid) =>{
         const that = this;
@@ -104,7 +104,7 @@ export default class Main extends Component {
 		ws.connect({}, function() {
             // alert("connect");
             that.connectStatus = 1;//链接成功;
-			ws.send("/app/consult", {}, JSON.stringify(payload));
+            ws.send("/app/consult", {}, JSON.stringify(payload));
 			ws.subscribe("/topic/"+userid, function(resp) {
                 console.log("============")
                 console.log(resp.body);
@@ -152,6 +152,10 @@ export default class Main extends Component {
                
                 that.setState({
                     data
+                },function(){
+                    setTimeout(function(){
+                        that.gotoBottom();
+                    },500)
                 })
 			});
 		}, function(err) {
@@ -162,12 +166,15 @@ export default class Main extends Component {
         // this.connect();
 
         let that = this;
+        if(!isInWeiXin){
+            //
 
+        }
         
-        let token = localStorage.getItem('token');
+        let token = localStorage.getItem('tokenh5');
         let userid = localStorage.getItem('userid');
         // alert("token:   "+token)
-        if(!token){
+        if(!token || !userid){
             // 在微信打开情况 去获取token
             if(isInWeiXin()){
                 const code = getUrlParam('code');
@@ -186,9 +193,9 @@ export default class Main extends Component {
 // token: "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE1NzUwMzk4NTUsImp0aSI6IjFsUDRneWk3XzI1SEdLMjRDWjNQcUEiLCJzdWIiOiJ7XCJ1c2VySWRcIjpcIjBmMDExZTYzLWRkYWItNDZiNS1hNzQ3LWIwZDYwYjI1YTRkMVwifSJ9.pNlwjtLg9zd3I0dlPc862pSnVWn3UVhBwa56ygCSa_LRPUxHJWva1dTS_RRPP_5phZJFTYDESHoNDMdQba2Sog"
 // userId: "0f011e63-ddab-46b5-a747-b0d60b25a4d1"
                             const {refreshToken,token,userId} = entity;
-                            localStorage.setItem('token',token)
+                            localStorage.setItem('tokenh5',token)
                             localStorage.setItem('refreshToken',refreshToken)
-                            localStorage.setItem('userId',userId)
+                            localStorage.setItem('userid',userId)
 
                             // 获取token成功后 关闭loading
                             setTimeout(function(){
@@ -245,7 +252,12 @@ export default class Main extends Component {
     }
 
     gotoBottom = () =>{
-        document.getElementsByClassName('chat-main-panel')[0].scrollTop = 10000
+        const panel = document.getElementsByClassName('chat-main-panel');
+        
+        if(panel && panel[0]){
+            panel[0].scrollTop = 10000
+        }
+        
     }
     clearInput =()=>{ //清空input
         this.setState({
@@ -277,6 +289,7 @@ export default class Main extends Component {
 
         //真的去发送消息给后台
         if(this.connectStatus ==1){
+            // alert(this.userid)
             var payload = {
                 "userId": this.userid,
                 "content": value,
@@ -289,11 +302,11 @@ export default class Main extends Component {
         
     }
     previewByWx = (url) =>{
-        console.log(url)
-        wx && wx.previewImage({
-            current: url, // 当前显示图片的http链接
-            urls: [url] // 需要预览的图片http链接列表
-          });
+        // console.log(url)
+        // wx && wx.previewImage({
+        //     current: url, // 当前显示图片的http链接
+        //     urls: [url] // 需要预览的图片http链接列表
+        //   });
     }
 
     toggleModal = () => {
@@ -564,7 +577,8 @@ export default class Main extends Component {
                         </div>
                         <div className="input-wrap">
                             <form action="javascript:return true">
-                                <input value={value} placeholder="说点什么吧..." onKeyPress={this.handleEnterKey} onChange={this.onChange.bind(this)}></input>
+                                <input value={value}  confirm-type="send" confirm-hold="true" placeholder="说点什么吧..." onKeyPress={this.handleEnterKey} onChange={this.onChange.bind(this)}></input>
+                                <span className='send-btn' onClick={this.send}>发送</span>
                             </form>
                         </div>
                     </div>

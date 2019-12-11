@@ -38,43 +38,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
     <script src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
     
-    <!-- baidumap -->
-    <!-- <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />  
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
-    <title>Baidu Map </title>  
-    <style type="text/css">  
-        html{height:100%}  
-        body{height:100%;margin:0px;padding:0px}  
-        #container{height:100%}  
-    </style>  
-    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=uGkXsIVOoivV3fG0YehWyfQ4tgTBl94e"></script> -->
-    <!-- /baidumap -->
-    <!-- <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=fce91156d9e7cbe3527d7e863fe1d8a8"></script> -->
     
   </head>
-
   <body>
-    <noscript>
-      线路招标
-    </noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-    
     
   </body>
  
 
 </html>
-
-<script> 
- 
+<script type="text/javascript">
+  var ua = navigator.userAgent.toLowerCase();
+  var isWeixin = ua.indexOf('micromessenger') != -1;
+  var isAndroid = ua.indexOf('android') != -1;
+  var isIos = (ua.indexOf('iphone') != -1) || (ua.indexOf('ipad') != -1);
+  if (!isWeixin) {
+      document.head.innerHTML = '<title>抱歉，出错了</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0"><link rel="stylesheet" type="text/css" href="https://res.wx.qq.com/open/libs/weui/0.4.1/weui.css">';
+      document.body.innerHTML = '<div class="weui_msg"><div class="weui_icon_area"><i class="weui_icon_info weui_icon_msg"></i></div><div class="weui_text_area"><h4 class="weui_msg_title">请在微信客户端打开链接</h4></div></div>';
+  }else{
+     
+  }
 </script>
