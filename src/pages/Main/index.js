@@ -556,7 +556,7 @@ export default class Main extends Component {
                     <article> 
                         {describes}
                     </article>
-                    <input id ='target_url' style={{opacity:0,height:0}} type="text" value={extraInformation}/>
+                    <input id ='target_url' readonly="readonly" style={{opacity:0,height:0}} type="text" value={extraInformation}/>
                 </div>
             </div>
         )
