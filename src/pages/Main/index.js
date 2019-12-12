@@ -17,10 +17,6 @@ import {isInWeiXin,getUrlParam} from '@/utils/Tools';
 
 
 import {getToken,addClickNum,getCardDetail} from '@/services/api';
-
-import ClipboardJS from 'clipboard';
-console.log(ClipboardJS);
-
 const wx = window.wx;
 // type 0是发  1是收
 const  data = [
@@ -64,28 +60,6 @@ const GREET = "GREET";
 const CHAT = "CHAT";
 const ACK = "ACK";
 const $ = window.$;
-
-function copymsg() {
-    var Url2 = document.getElementById("target_url");//要复制文字的节点
-    if (navigator.userAgent.match(/(iPhone|iPod|iPad);?/i)) {//区分iPhone设备
-        window.getSelection().removeAllRanges();//这段代码必须放在前面否则无效
-        var range = document.createRange();
-        // 选中需要复制的节点
-        range.selectNode(Url2);
-        // 执行选中元素
-        window.getSelection().addRange(range);
-        // 执行 copy 操作
-        var successful = document.execCommand('copy');
-
-        // 移除选中的元素
-        window.getSelection().removeAllRanges();
-        Toast.success("复制HTML链接成功",2);
-    } else {
-        Url2.select(); // 选择对象
-        document.execCommand("Copy"); // 执行浏览器复制命令
-        Toast.success("复制HTML链接成功",2);
-    }
-}
 export default class Main extends Component {
     constructor(props) {
         super(props)
@@ -99,6 +73,7 @@ export default class Main extends Component {
                 avatarUrl:'',
             },
             value:'',
+            waitingBack:false,
             showDetail:false,
             detailEntity:{
 
@@ -156,6 +131,7 @@ export default class Main extends Component {
         
                     //     })
                     // })
+                    console.log('G?');
                 }else{
                     if(action != ACK){
                         data.push({
@@ -167,10 +143,16 @@ export default class Main extends Component {
                             message,
                             messageType,
                             ...messageobj
-                        })
+                        });
+                        console.log('!ACK');
+                        that.setState({
+                             waitingBack:false
+                        });
                     }else if(action == ACK){
-
-
+                        console.log('ACK');
+                        that.setState({
+                             waitingBack:true
+                        });
                     }
                     
                 }
@@ -181,7 +163,7 @@ export default class Main extends Component {
                 },function(){
                     setTimeout(function(){
                         that.gotoBottom();
-                    },500)
+                    },400)
                 })
 			});
 		}, function(err) {
@@ -189,8 +171,6 @@ export default class Main extends Component {
         });
     }
     componentDidMount() {
-
-
         
         // this.connect();
 
@@ -231,28 +211,26 @@ export default class Main extends Component {
                                 that.setState({
                                     loading:false
                                 })
-                            },1000)
+                            },600)
                             that.connect(userId);
                         }else if(status == "FAIL"){
-                            if(errorCode == '4002006'){
+                            if(errorCode == '4002006'){                      
                                 // openid不存在
                                 // const appid = 'wxc67539da0be022b4';
                                 // const redirect_uri	= encodeURI('http://senioryehe.com/');
                                 let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_userinfo&state=register#wechat_redirect`;
-
+                                // let url = 'http://localhost:3000/?'
                                 window.location.href = url;
                             }else{
                                 Toast.fail("errorDescription");
                             }
-                            
-                            
                         }
                     })
                 }else{
                     // const appid = 'wxc67539da0be022b4';
                     // const redirect_uri	= encodeURI('http://senioryehe.com/');
                     let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect_uri}&response_type=code&scope=snsapi_base&state=check#wechat_redirect`;
-
+                    // let url = 'http://localhost:3000/?'
                     window.location.href = url;
                 }
             }
@@ -261,7 +239,7 @@ export default class Main extends Component {
                 that.setState({
                     loading:false
                 })
-            },1000)
+            },600)
             that.connect(userid);
         }
         
@@ -438,10 +416,10 @@ export default class Main extends Component {
             case RECOMMEND://推荐选项（对应recommendList） 知识库（对应knowledge）
                 msgDom = (
                     <ul className="item-l-choices">
-                    <p className='choice-item-title'>{message}</p>
+                    <p className='choice-item-title'>👇不确定你需要的是哪个</p>
                         {recommendList.map(function(obj,i){
                             const {title,knowledgeId,answerSource} = obj;
-                            return <li key = {i} onClick={()=>{that.replyReommend(obj,item)}}>{title}</li>
+                            return <li key = {i} onClick={()=>{that.replyReommend(obj,item)}}>&gt; {title}</li>
                         })}
                 </ul>
                );
@@ -471,6 +449,7 @@ export default class Main extends Component {
 
         return data.map((item,i) =>{
             console.log(item)
+            console.log('renderMsgList')
             const {type,username,message,send_loading,send_result,messageType} = item;
             if(type == 1){
                 return <div className='l' key={i}>
@@ -518,37 +497,23 @@ export default class Main extends Component {
     }
     copy =() =>{
         //复制
-        // let me = $('#target_urlz')[0];
-        // me.focus();
-        // me.select();
-        // try{
-        //     if(document.execCommand('copy', false, null)){
-        //         //success info
-        //         Toast.success("复制HTML链接成功",2);
-        //     } else{
-        //         //fail info
-        //     }
-
-        // } catch(err){
-        //     //fail info
-        // }
-
-
-        var clipboard = new ClipboardJS('.copy-btn');
-
-        clipboard.on('success', function(e) {
-            console.info('Action:', e.action);
-            console.info('Text:', e.text);
-            console.info('Trigger:', e.trigger);
-
-            e.clearSelection();
-            Toast.success("复制HTML链接成功",2);
+        let me = $('#target_url')[0];
+        $('#target_url').on('touchstart',function(e) {
+            e.preventDefault();
         });
+        me.focus();
+        me.select();
+        try{
+            if(document.execCommand('copy', false, null)){
+                //success info
+                Toast.success("已复制",2);
+            } else{
+                //fail info
+            }
 
-        clipboard.on('error', function(e) {
-            console.error('Action:', e.action);
-            console.error('Trigger:', e.trigger);
-        });
+        } catch(err){
+            //fail info
+        }
     }
     showDetailModal = () =>{
         
@@ -594,36 +559,42 @@ export default class Main extends Component {
                             {/* 链接:https://pan.baidu.com/s/19pNAsmsFGTdert 密码:2he4 */}
                             链接:{extraInformation}
                         </p>
-                        <span className="copy-btn" data-clipboard-text={extraInformation} onClick={()=>{this.copy()}}>复制</span>
+                        <span className="copy-btn" onClick={()=>{this.copy()}}>复制</span>
                     </div>
-
                     <article> 
                         {describes}
                     </article>
-                    {/* <span id ='target_url' readOnly="readonly" style={{opacity:0,height:0,'zIndex':-1}} type="text" value={extraInformation}/> */}
+                    <input id ='target_url' style={{opacity:0,height:0}} type="text" value={extraInformation}/>
                 </div>
             </div>
         )
     }
     render() {
-        const {loading,value,modalShow,showDetail,detailEntity} = this.state;
+        const {loading,value,modalShow,showDetail,detailEntity,waitingBack} = this.state;
         const detailEntityModal = showDetail ? this.showDetailModal(): "";
         return <div className='home-wrap homelayout'>
             {
                 loading? <img src={mainLoading} className='mainloading'/>:(
                 <div className='main-content'>
-                    
-                    <div className='app-icon-wrap' onClick={this.toggleModal}>
-                        <img src={app_icon} className='app-icon'/>
-                        <span className='noti-dot'></span>
+                    <div className='flex2H-wrap'>
+                        <div className='app-icon-wrap' onClick={this.toggleModal}>
+                            <img src={app_icon} className='app-icon'/>
+                            <span className='noti-dot'></span>
+                        </div>
+                        <div>
+                            <p className='app-name'>也贺</p>
+                        </div>
                     </div>
+
                     <div className='chat-window'>
                         <p className='top-indicator'>
                             {/* <span className="color1"></span>
                             <span className="color2"></span>
                             <span className="color3"></span> */}
-                            <img src={loadingSvg} />
+                            <img className={waitingBack?'':'hide'} src={loadingSvg} />
                         </p>
+                        <div className='top-mask'></div>
+                        
                         <div className='chat-main-panel'>
                             <div className='chat-inner-wrap'>
                                 {this.renderMsgList()}
@@ -631,7 +602,7 @@ export default class Main extends Component {
                         </div>
                         <div className="input-wrap">
                             <form action="javascript:return true">
-                                <input value={value}  confirm-type="send" confirm-hold="true" placeholder="说点什么吧..." onKeyPress={this.handleEnterKey} onChange={this.onChange.bind(this)} onFocus={this.onFocus}></input>
+                                <input value={value}  confirm-type="send" confirm-hold="true" placeholder="需要帮助吗..." onKeyPress={this.handleEnterKey} onChange={this.onChange.bind(this)} onFocus={this.onFocus}></input>
                                 <span className='send-btn' onClick={this.send}>发送</span>
                             </form>
                         </div>
