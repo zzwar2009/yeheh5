@@ -17,6 +17,10 @@ import {isInWeiXin,getUrlParam} from '@/utils/Tools';
 
 
 import {getToken,addClickNum,getCardDetail} from '@/services/api';
+
+import ClipboardJS from 'clipboard';
+console.log(ClipboardJS);
+
 const wx = window.wx;
 // type 0是发  1是收
 const  data = [
@@ -60,6 +64,28 @@ const GREET = "GREET";
 const CHAT = "CHAT";
 const ACK = "ACK";
 const $ = window.$;
+
+function copymsg() {
+    var Url2 = document.getElementById("target_url");//要复制文字的节点
+    if (navigator.userAgent.match(/(iPhone|iPod|iPad);?/i)) {//区分iPhone设备
+        window.getSelection().removeAllRanges();//这段代码必须放在前面否则无效
+        var range = document.createRange();
+        // 选中需要复制的节点
+        range.selectNode(Url2);
+        // 执行选中元素
+        window.getSelection().addRange(range);
+        // 执行 copy 操作
+        var successful = document.execCommand('copy');
+
+        // 移除选中的元素
+        window.getSelection().removeAllRanges();
+        Toast.success("复制HTML链接成功",2);
+    } else {
+        Url2.select(); // 选择对象
+        document.execCommand("Copy"); // 执行浏览器复制命令
+        Toast.success("复制HTML链接成功",2);
+    }
+}
 export default class Main extends Component {
     constructor(props) {
         super(props)
@@ -492,20 +518,37 @@ export default class Main extends Component {
     }
     copy =() =>{
         //复制
-        let me = $('#target_url')[0];
-        me.focus();
-        me.select();
-        try{
-            if(document.execCommand('copy', false, null)){
-                //success info
-                Toast.success("复制HTML链接成功",2);
-            } else{
-                //fail info
-            }
+        // let me = $('#target_urlz')[0];
+        // me.focus();
+        // me.select();
+        // try{
+        //     if(document.execCommand('copy', false, null)){
+        //         //success info
+        //         Toast.success("复制HTML链接成功",2);
+        //     } else{
+        //         //fail info
+        //     }
 
-        } catch(err){
-            //fail info
-        }
+        // } catch(err){
+        //     //fail info
+        // }
+
+
+        var clipboard = new ClipboardJS('.copy-btn');
+
+        clipboard.on('success', function(e) {
+            console.info('Action:', e.action);
+            console.info('Text:', e.text);
+            console.info('Trigger:', e.trigger);
+
+            e.clearSelection();
+            Toast.success("复制HTML链接成功",2);
+        });
+
+        clipboard.on('error', function(e) {
+            console.error('Action:', e.action);
+            console.error('Trigger:', e.trigger);
+        });
     }
     showDetailModal = () =>{
         
@@ -551,12 +594,13 @@ export default class Main extends Component {
                             {/* 链接:https://pan.baidu.com/s/19pNAsmsFGTdert 密码:2he4 */}
                             链接:{extraInformation}
                         </p>
-                        <span className="copy-btn" onClick={()=>{this.copy()}}>复制</span>
+                        <span className="copy-btn" data-clipboard-text={extraInformation} onClick={()=>{this.copy()}}>复制</span>
                     </div>
+
                     <article> 
                         {describes}
                     </article>
-                    <input id ='target_url' readonly="readonly" style={{opacity:0,height:0}} type="text" value={extraInformation}/>
+                    {/* <span id ='target_url' readOnly="readonly" style={{opacity:0,height:0,'zIndex':-1}} type="text" value={extraInformation}/> */}
                 </div>
             </div>
         )
