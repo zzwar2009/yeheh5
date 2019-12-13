@@ -1,13 +1,13 @@
 
 :global{
     #se-knowledge img {
-    max-width: 100%!important;
-    height: auto!important;
-    /* border: 1px solid #999!important; */
-    box-sizing: border-box!important;
-    -moz-box-sizing: border-box!important;
-    -webkit-box-sizing: border-box!important;
-}
+        max-width: 100%!important;
+        height: auto!important;
+        /* border: 1px solid #999!important; */
+        box-sizing: border-box!important;
+        -moz-box-sizing: border-box!important;
+        -webkit-box-sizing: border-box!important;
+    }
     .home-wrap{
         position: relative;
         height:100%;
@@ -64,8 +64,11 @@
         
     }
     .chat-window{
-        position:absolute;
         background-color:rgba(255,255,255,1);
+        // position:absolute;
+        position: relative;
+        top:20%;
+        // padding-bottom: 50px;
         z-index:2;
         height:80%;
         bottom:0;
@@ -203,6 +206,7 @@
             margin-bottom: 5px;
         }
         .wangpan-address{
+            position: relative;
             height:64px;
             background:rgba(244,255,231,1);
             border-radius:4px;
@@ -223,12 +227,15 @@
             word-break: break-all;
         }
         .copy-btn{
-            width:24px;
-            height:16px;
-            font-size:12px;
-            font-weight:400;
-            color:rgba(33,109,255,1);
-            line-height:16px;
+            height: 16px;
+            font-size: 12px;
+            font-weight: 400;
+            color: #216dff;
+            line-height: 16px;
+            font-size: 14px;
+            position: absolute;
+            right: 10px;
+            top: 20px;
         }
         article{
             font-size:16px;
@@ -288,6 +295,7 @@
     }
     .tab-content.active{
         display:block;
+        text-align: center;
     }
     .s_banner{
         width:80%;
@@ -495,6 +503,10 @@
         background: #fff;
         padding:0 10px;
         box-sizing: border-box;
+        // position: fixed;
+        // left: 0;
+        // right: 0;
+        // bottom: 10px;
     }
     .input-wrap form{
         display: flex;
