@@ -131,7 +131,6 @@ export default class Main extends Component {
         
                     //     })
                     // })
-                    console.log('G?');
                 }else{
                     if(action != ACK){
                         data.push({
@@ -153,11 +152,8 @@ export default class Main extends Component {
                         that.setState({
                              waitingBack:true
                         });
-                    }
-                    
+                    } 
                 }
-
-               
                 that.setState({
                     data
                 },function(){
