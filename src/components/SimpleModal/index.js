@@ -38,7 +38,7 @@ export default class SimpleModal extends Component {
         // let  clstabheaderitem = classNames('tab-header-item,{"active":!show});
 
 
-        const headeritems = ['勾搭指南','版本功能'].map((current,index) =>{
+        const headeritems = ['对话指南','研发社区'].map((current,index) =>{
             let  clstabheaderitem = classNames('tab-header-item',{"active":index==activeIndex})
         return <li key={index} className={clstabheaderitem} onClick={(e) => { e.stopPropagation();this.openTab(index)} }>{current}</li>
         })
@@ -46,23 +46,27 @@ export default class SimpleModal extends Component {
             let  clscontentitem = classNames('tab-content',{"active":index==activeIndex})
             if(index ==0){
                 return <div className={clscontentitem} key={"fffff"}>
-                        <img src={s_banner1} className='s_banner'/>
-                        <p className='somequestion'>“今天有什么好文推荐？”</p>
-                        <p className='somequestion'>“帮我找套视频社交产品的UI模板”</p>
-                        <p className='somequestion'>“《交互设计精髓》电子书有吗”</p>
-                        <p className='somequestion'>“想看帅哥美女图~”</p>
-                        <p className='somequestion'>“上班摸鱼，有小丑的电影资源吗”</p>
-                        <p className='somequestion'>……</p>
+                        <p className='somequestion'>也贺会主动推送优质内容<br/>记得有空常来看看鸭</p>
+                        <p className='somequestion-t'>搜索行业资源</p>
+                        <p className='somequestion-d'>“帮我找社交类的sketch资源”</p>
+                        <p className='somequestion-t'>储存行业知识</p>
+                        <p className='somequestion-d'>“手机状态栏高度是多少”</p>
+                        <p className='somequestion-t'>整合行业信息</p>
+                        <p className='somequestion-d'>“今天的推荐文章”</p>
+                        <p className='somequestion-t'>蕴藏娱乐资源</p>
+                        <p className='somequestion-d'>“电影：小丑”</p>
+                        <p className='somequestion-d'>……</p>
                 </div>
             }
             if(index == 1){
                 return <div className={clscontentitem} key={"fdsfds"}>
-                    <img src={s_banner2} className='s_banner2'/>
-                    <p className='version-text'>加入产品开发社区，共同调教也贺</p>
-                    <p className='version-text'><span className='imp'>成为</span>AI 语聊训练师</p>
-                    <p className='version-text'><span className='imp'>解锁</span>发语音、发图片功能</p>
-                    <p className='version-text'><span className='imp'>解锁</span>分类收藏功能</p>
-                    <p className='version-text'><span className='imp'>获得</span>永久免费体验权 ……</p>
+                    <img src={s_banner2} className='s_banner'/>
+                    <p className='somequestion-t'>扫码加入研发社区，见证AI成长</p>
+                    <p className='somequestion-d'><span className='imp'>加入</span>也贺智囊团</p>
+                    <p className='somequestion-d'><span className='imp'>解锁</span>隐藏语聊功能</p>
+                    <p className='somequestion-d'><span className='imp'>解锁</span>分类收藏功能</p>
+                    <p className='somequestion-d'><span className='imp'>获得</span>永久免费体验权</p>
+                    <p className='somequestion-d'>……</p>
                 </div>
             }
             
