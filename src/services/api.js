@@ -457,6 +457,17 @@ export async function addClickNum(id) {
     });
 }
 
+export async function getWeChatSignature(url) {
+    return request(UrlConfig.new_api_host, `wechat/signature`, {
+        method: 'GET',
+        data: {
+            url:url,
+        },
+    });
+}
+
+// /api/client/v1/wechat/signature
+
 
 // /api/client/v1/resource/getDetails/{id}
 
