@@ -15,7 +15,7 @@ import closeSvg from '@/res/close.svg';
 import SimpleModal from  '@/components/SimpleModal';
 import {isInWeiXin,getUrlParam} from '@/utils/Tools';
 
-import {getToken,addClickNum,getCardDetail,getWeChatSignature} from '@/services/api';
+import {getToken,addClickNum,getCardDetail,getWeChatSignature,historyMessage} from '@/services/api';
 
 import ClipboardJS from 'clipboard';
 
@@ -83,6 +83,27 @@ export default class Main extends Component {
         })
 
         
+    }
+    loadHistory = (userid) =>{
+        //历史消息
+
+        // historyMessage
+
+        let data = {
+            "current": 1,
+            "size": 200,
+            "userId": userid
+        }
+        // historyMessage(data).then(function(res){
+        //     console.log(res)
+        //     const { status ,entity} = res;
+        //     if(status == "OK"){
+                
+
+        //     }else{
+
+        //     }
+        // })
     }
     connect = (userid) =>{
         const that = this;
@@ -227,6 +248,7 @@ export default class Main extends Component {
                                 })
                             },600)
                             that.connect(userId);
+                            that.loadHistory(userId)
                         }else if(status == "FAIL"){
                             if(errorCode == '4002006'){                      
                                 // openid不存在
@@ -255,6 +277,7 @@ export default class Main extends Component {
                 })
             },600)
             that.connect(userid);
+            that.loadHistory(userid)
         }
         
         
@@ -534,6 +557,8 @@ export default class Main extends Component {
         
         const {detailEntity} = this.state;
         const {img,name,tag,type,years,extraInformation,fileFormat,describes,createTime} = detailEntity;
+        console.log(detailEntity)
+        console.log(111111111)
         const tags = tag.split(' ').map(function(tagitem){
             return <span className="tag">{tagitem}</span>
         })
@@ -541,21 +566,28 @@ export default class Main extends Component {
         if(Array.isArray(img)){
             if( img.length == 1){
                 imgDom = (<img className='single-banner' src={img[0]}/>)
-            } else{
-                const a = Math.floor(img / 2);
-                const b = img % 2;
+            } else if(img.length > 1){
+                const a = Math.floor(img.length / 2);
+                const b = img.length % 2;
+                console.log(a,b)
                 var arr = [];
-                for (var i =0;i<a ;i+2){
-                    const f = i+1;
-                    const s = i+2;
+                for (var i =0;i<a ;i++){
+                    console.log()
+                    
+                    const f = i;
+                    const s = i+1;
+                    console.log(img[f])
+                    console.log(img[s])
                     arr.push(
                         <div className="multi-banner">
                             <img className='' src={img[f]}/>
                             {img.length>s ? <img className='' src={img[s]}/> :""}
                         </div>
                     )
-                    imgDom ={arr}
                 }
+                console.log(arr);
+                console.log("+++++++++++SSSSSS++++++")
+                imgDom = arr
             }
         }
         
