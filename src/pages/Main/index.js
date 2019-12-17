@@ -91,19 +91,23 @@ export default class Main extends Component {
 
         let data = {
             "current": 1,
-            "size": 200,
+            "size": 30,
             "userId": userid
         }
-        // historyMessage(data).then(function(res){
-        //     console.log(res)
-        //     const { status ,entity} = res;
-        //     if(status == "OK"){
-                
+        let that = this;
+        historyMessage(data).then(function(res){
+            console.log(res)
+            const { status ,entities} = res;
+            if(status == "OK"){
+                console.log(entities)
+                // that.setState({
 
-        //     }else{
+                // })
 
-        //     }
-        // })
+            }else{
+
+            }
+        })
     }
     connect = (userid) =>{
         const that = this;

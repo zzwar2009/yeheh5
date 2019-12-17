@@ -75,17 +75,17 @@ export default function request(url, api, options) {
         credentials: 'include',
     };
     const newOptions = { ...defaultOptions, ...options };
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('tokenh5');
+    newOptions.headers = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
+        'YEHE-TOKEN':token,
+        ...newOptions.headers,
+    };
     if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
-        newOptions.headers = {
-            Accept: 'application/json',
-            'Content-Type': 'application/json; charset=utf-8',
-            token,
-            ...newOptions.headers,
-        };
         newOptions.data = { ...newOptions.data };
     } else {
-        newOptions.params = { ...newOptions.data, token };
+        newOptions.params = { ...newOptions.data };
     }
     console.log('start......................');
     console.log('url:');

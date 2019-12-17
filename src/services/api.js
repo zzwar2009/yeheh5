@@ -52,7 +52,7 @@ export async function getWeChatSignature(url) {
 export async function historyMessage(data) {
     return request(UrlConfig.new_api_host, `message/pageMessage`, {
         method: 'POST',
-        data:JSON.stringify(data),
+        data:data,
     });
 }
 // /api/client/v1/message/pageMessage
