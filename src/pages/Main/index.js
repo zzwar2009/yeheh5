@@ -91,7 +91,7 @@ export default class Main extends Component {
 
         let data = {
             "current": 1,
-            "size": 30,
+            "size": 10,
             "userId": userid
         }
         let that = this;
@@ -219,10 +219,9 @@ export default class Main extends Component {
 
         let that = this;
         
-        let token = localStorage.getItem('tokenh5');
-        let userid = localStorage.getItem('userid');
+        
         // alert("token:   "+token)
-        if(!token || !userid){
+        // if(!token || !userid){
             // 在微信打开情况 去获取token
             if(isInWeiXin()){
                 const code = getUrlParam('code');
@@ -273,16 +272,24 @@ export default class Main extends Component {
                     // let url = 'http://localhost:3000/?'
                     window.location.href = url;
                 }
+            }else{
+                //本机调试网页情况
+                let token = localStorage.getItem('tokenh5');
+                let userid = localStorage.getItem('userid');
+                if(token && userid){
+                    setTimeout(function(){
+                        that.setState({
+                            loading:false
+                        })
+                    },600)
+                    that.connect(userid);
+                    that.loadHistory(userid)
+                }else{
+                    alert('本地没有tokenh5 ,userid')
+                }
+               
             }
-        }else{
-            setTimeout(function(){
-                that.setState({
-                    loading:false
-                })
-            },600)
-            that.connect(userid);
-            that.loadHistory(userid)
-        }
+        
         
         
     }
