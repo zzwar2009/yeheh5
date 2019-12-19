@@ -51,6 +51,7 @@ const CHATKEY = 'CHATKEY';
 
 const appid = 'wxc67539da0be022b4';
 const redirect_uri	= encodeURI('http://senioryehe.com/');
+const uri = 'http://senioryehe.com/';
 
 let messageData = localStorage.getItem(CHATKEY) || [];
 const TEXT = "TEXT";
@@ -62,6 +63,7 @@ const GREET = "GREET";
 const CHAT = "CHAT";
 const ACK = "ACK";
 const $ = window.$;
+const PAGE_SIZE = 20;
 export default class Main extends Component {
     constructor(props) {
         super(props)
@@ -79,30 +81,144 @@ export default class Main extends Component {
             showDetail:false,
             detailEntity:{
 
-            }
+            },
+            current:1, // 当前第几页
+            hasMore:true,//是否显示加载下一页
+            hisloading:false,// 正在加载历史中。。
         })
+       
 
         
     }
-    loadHistory = (userid) =>{
+    loadNextPage = () =>{
+        
+        this.loadHistory(this.userid,this.state.current+1)
+    }
+    loadHistory = (userid,page) =>{
         //历史消息
+        let that = this;
+        // const lastScrollTop = that.getScrollTop();
+        // console.log("lsttop----"+lastScrollTop)
 
         // historyMessage
-
-        let data = {
-            "current": 1,
-            "size": 10,
-            "userId": userid
+        this.userid = userid;
+        let params = {
+            "current": page || 1,
+            "size": PAGE_SIZE,
+            "userId": this.userid
         }
-        let that = this;
-        historyMessage(data).then(function(res){
-            console.log(res)
-            const { status ,entities} = res;
-            if(status == "OK"){
-                console.log(entities)
-                // that.setState({
-
+        
+        const {data} = this.state;
+        
+        function _cleanData(historydata){
+            const hisData = historydata || [];
+            // const {type,message,send_loading,send_result,messageType,recommendList,resourceDto} = item;
+            return hisData.map(function(item){
+                // direction 0: 客户端发送的，1 服务器返回的
+                const {direction,type,message,userId} = item;
+                if(direction == 0){
+                    //客户端发送
+                    return {
+                        // "send_loading":true,
+                        // "userid": this.userid,
+                        "type":"0",
+                        // "username":"../../assets/avatar.png",
+                        // "avatar":"",
+                        "message":message,
+                        "sessionId":''
+                    }
+                }else if(direction ==1){
+                    let data = {
+                        // "userid":sessionId,
+                        // "username":"小助手",
+                        "type":"1",
+                        // "avatar":"../../assets/avatar.png",
+                        sessionId:'',
+                        // message,
+                        // messageType,
+                        // ...messageobj
+                    }
+                    // const {type,message,send_loading,send_result,messageType,recommendList,resourceDto} = item;
+                    switch(type){
+                        case TEXT:// 纯文本或者闲聊(直接展示)，
+                            data = {
+                                ...data,
+                                message,
+                                messageType:TEXT
+                            }
+                            break;
+                        case IMG:
+                            data = {
+                                ...data,
+                                message,
+                                messageType:IMG
+                            }
+                            break;
+                        
+                        case RECOMMEND://推荐选项（对应recommendList） 知识库（对应knowledge）
+                            data = {
+                                ...data,
+                                recommendList:JSON.parse(message),
+                                messageType:RECOMMEND
+                            }
+                            break;
+                        case CARD://资源卡(对应resourceList)，
+                            data = {
+                                ...data,
+                                resourceDto:JSON.parse(message),
+                                messageType:CARD
+                            }
+                            break;
+                        case 4://打招呼（对应greet）
+                            break;
+                        default:
+                            data = {
+                                ...data,
+                                message,
+                                messageType:TEXT
+                            }
+            
+                    }
+                    // 服务端返回
+                    return data;
+                }
+                // data.push(
+                //     {
+                //     // "send_loading":true,
+                //     // "userid": this.userid,
+                //     "type":"0",
+                //     // "username":"../../assets/avatar.png",
+                //     // "avatar":"",
+                //     "message":value,
+                //     "sessionId":that.sessionId
                 // })
+               
+            })
+        }
+        
+        
+        that.setState({
+            current:page,
+            hisloading:true,
+        })
+        
+        
+        historyMessage(params).then(function(res){
+            const { status ,entities,pages,total,pageNum} = res;
+            // pages 后段给的总页数
+            if(status == "OK"){
+                console.log(_cleanData(entities))
+
+                const newdata = _cleanData(entities).concat(data);
+                console.log(newdata);
+                that.setState({
+                    data:newdata,
+                    hisloading:false,
+                    hasMore:pages>pageNum,// 当前页码小于等于总页吗 有下一页
+                    current:pageNum//后段给的当前页码
+                },function(){
+                    that.gotoGivenTop(600);//象征性的滚一点给用户自己滚动的乐趣
+                })
 
             }else{
 
@@ -194,7 +310,7 @@ export default class Main extends Component {
 
         this.previewList = [];//预览imgs列表
 
-        isInWeiXin() && getWeChatSignature(window.location.href).then(function(res){
+        isInWeiXin() && getWeChatSignature(uri).then(function(res){
             const { status ,errorCode,errorDescription,entity} = res;
             console.log(res)
             if(status == "OK"){
@@ -306,11 +422,37 @@ export default class Main extends Component {
        }
     }
 
+    getScrollTop = () =>{
+        const panel = document.getElementsByClassName('chat-main-panel');
+        
+        if(panel && panel[0]){
+            return panel[0].scrollTop || 0;
+        }else{
+            return 0;
+        }
+    }
     gotoBottom = () =>{
         const panel = document.getElementsByClassName('chat-main-panel');
         
         if(panel && panel[0]){
             panel[0].scrollTop = 10000
+        }
+        
+    }
+    gotoGivenTop = (top) =>{
+        const panel = document.getElementsByClassName('chat-main-panel');
+        
+        if(panel && panel[0]){
+            panel[0].scrollTop = top
+        }
+        
+    }
+
+    gotoTop = () =>{
+        const panel = document.getElementsByClassName('chat-main-panel');
+        
+        if(panel && panel[0]){
+            panel[0].scrollTop = 0
         }
         
     }
@@ -644,7 +786,7 @@ export default class Main extends Component {
         console.log("===========")
     }
     render() {
-        const {loading,value,modalShow,showDetail,detailEntity,waitingBack} = this.state;
+        const {loading,value,modalShow,showDetail,detailEntity,waitingBack,hisloading,hasMore} = this.state;
         const detailEntityModal = showDetail ? this.showDetailModal(): "";
         this.setPreViewList()
         return <div className='home-wrap homelayout'>
@@ -672,6 +814,14 @@ export default class Main extends Component {
                         
                         <div className='chat-main-panel'>
                             <div className='chat-inner-wrap'>
+                                {
+                                    hasMore  && <div className='loadmore-wrap' onClick = {this.loadNextPage}>
+                                        {
+                                            hisloading ? <img className="loading-ani" src={loadingSvg} />:<p className="loadmore">点击查看更多历史</p>
+                                        }
+                                        
+                                    </div>
+                                }
                                 {this.renderMsgList()}
                             </div>
                         </div>
